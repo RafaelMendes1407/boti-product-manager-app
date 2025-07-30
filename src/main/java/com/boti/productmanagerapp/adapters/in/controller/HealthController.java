@@ -1,4 +1,4 @@
-package com.boti.productmanagerapp.infrastructure.adapter;
+package com.boti.productmanagerapp.adapters.in.controller;
 
 
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthController {
 
     @GetMapping
-    public ResponseEntity<String> healthCheck() {
+    public ResponseEntity<String> execute() {
         return new ResponseEntity<>("Status: UP", HttpStatus.OK);
     }
 }
