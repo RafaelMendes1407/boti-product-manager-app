@@ -2,13 +2,13 @@ package com.boti.productmanagerapp.adapters.in.controller;
 
 import com.boti.productmanagerapp.adapters.in.web.dto.ProductRequest;
 import com.boti.productmanagerapp.application.core.domain.Product;
-import com.boti.productmanagerapp.application.core.exceptions.ProductAlreadyExistsException;
-import com.boti.productmanagerapp.application.core.usecases.InsertProduct;
+import com.boti.productmanagerapp.application.core.usecases.InsertProductUsecase;
+import com.boti.productmanagerapp.application.ports.out.LoggerPort;
+import com.boti.productmanagerapp.infrastructure.LoggerAdapter;
 import com.boti.productmanagerapp.utils.mappers.ProductMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,19 +23,20 @@ import java.net.URI;
 @RequestMapping("/v1/products")
 public class CreateProductController {
 
-    private static final Logger log = LoggerFactory.getLogger(CreateProductController.class);
-    private final InsertProduct insertProduct;
+    private final LoggerPort log;
+    private final InsertProductUsecase insertProductUsecase;
 
     @Autowired
-    public CreateProductController(InsertProduct insertProduct) {
-        this.insertProduct = insertProduct;
+    public CreateProductController(LoggerPort log, InsertProductUsecase insertProductUsecase) {
+        this.log = log;
+        this.insertProductUsecase = insertProductUsecase;
     }
 
     @PostMapping
     public ResponseEntity<?> execute(@RequestBody @Validated ProductRequest productRequest, UriComponentsBuilder uriBuilder) {
-        log.info("Starting product insertion: {}", productRequest.getProduct());
+        log.info(CreateProductController.class, String.format("Starting product insertion: %s", productRequest.getProduct()));
 
-        Product product = this.insertProduct.execute(ProductMapper.Instance.toProduct(productRequest));
+        Product product = this.insertProductUsecase.execute(ProductMapper.Instance.toProduct(productRequest));
 
         URI location = uriBuilder.path("/v1/products/{id}")
                 .buildAndExpand(product.getProductId())
