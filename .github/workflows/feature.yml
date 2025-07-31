@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build and Run Tests
+    name: Build
     runs-on: ubuntu-latest
 
     services:
@@ -108,7 +108,6 @@ jobs:
     name: Create Pull Request
     runs-on: ubuntu-latest
     needs: coverage
-
     permissions:
       contents: write
       pull-requests: write
@@ -121,15 +120,13 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          head: ${{ github.ref }}
           base: main
           title: 'feat: Automatic PR from feature branch - ${{ github.ref_name }}'
           body: |
             Este é um Pull Request automático gerado pela GitHub Actions.
             As verificações de build e cobertura foram concluídas com sucesso na branch `${{ github.ref_name }}`.
-            
+
             Por favor, revise e merge se apropriado.
-          update-branch: true
           labels: |
             automated-pr
             feature
