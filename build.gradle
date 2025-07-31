@@ -1,5 +1,6 @@
 plugins {
 	id 'java'
+	id 'jacoco'
 	id 'org.springframework.boot' version '2.7.1'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
@@ -11,6 +12,10 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(11)
 	}
+}
+
+jacoco {
+	toolVersion = "0.8.11"
 }
 
 repositories {
@@ -35,6 +40,27 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
+	jacoco {
+		enabled = true
+		// includes = ['com/boti/productmanagerapp/application/**']
+		excludes = [
+				'com/boti/productmanagerapp/ProductManagerAppApplication.class',
+				'com/boti/productmanagerapp/adapters/**',
+				'com/boti/productmanagerapp/config/**',
+				'com/boti/productmanagerapp/infrastructure/**'
+		]
+	}
 }
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		csv.required = false
+		html.required = true
+		html.outputLocation = layout.buildDirectory.dir('reports/jacocoHtml')
+	}
+}
+
