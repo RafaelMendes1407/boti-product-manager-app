@@ -9,6 +9,7 @@ class ProductManagerAppApplicationTests {
 
 	@Test
 	void contextLoads() {
+		System.out.println("Context Loads");
 	}
 
 }

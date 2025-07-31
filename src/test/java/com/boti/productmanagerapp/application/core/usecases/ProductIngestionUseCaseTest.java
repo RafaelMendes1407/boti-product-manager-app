@@ -5,10 +5,11 @@ import com.boti.productmanagerapp.application.core.domain.Product;
 import com.boti.productmanagerapp.application.core.exceptions.ProductAlreadyExistsException;
 import com.boti.productmanagerapp.application.ports.out.FileStreamPort;
 import com.boti.productmanagerapp.application.ports.out.LoggerPort;
-import com.boti.productmanagerapp.application.ports.out.ProductPort;
+import com.boti.productmanagerapp.application.ports.out.ProductRepositoryPort;
 import com.boti.productmanagerapp.application.ports.out.ProductResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.util.List;
@@ -21,14 +22,14 @@ import static org.mockito.Mockito.*;
 
 class ProductIngestionUseCaseTest {
 
-    private ProductPort repository;
+    private ProductRepositoryPort repository;
     private LoggerPort loggerPort;
     private FileStreamPort fileStreamPort;
     private ProductIngestionUseCase useCase;
 
     @BeforeEach
     void setUp() {
-        repository = mock(ProductPort.class);
+        repository = mock(ProductRepositoryPort.class);
         loggerPort = mock(LoggerPort.class);
         fileStreamPort = mock(FileStreamPort.class);
 
@@ -41,7 +42,7 @@ class ProductIngestionUseCaseTest {
         ProductResult result = new ProductResultImpl(product, null);
         Future<ProductResult> future = CompletableFuture.completedFuture(result);
 
-        when(fileStreamPort.startStream(anyList())).thenReturn(List.of(future));
+        when(fileStreamPort.startStream(Mockito.<List<File>>any())).thenReturn(List.of(future));
         when(repository.save(any(Product.class))).thenReturn(product);
 
         useCase.execute(List.of(new File("dummy.json")));
@@ -57,7 +58,7 @@ class ProductIngestionUseCaseTest {
         ProductResult result = new ProductResultImpl(product, null);
         Future<ProductResult> future = CompletableFuture.completedFuture(result);
 
-        when(fileStreamPort.startStream(anyList())).thenReturn(List.of(future));
+        when(fileStreamPort.startStream(Mockito.<List<File>>any())).thenReturn(List.of(future));
         when(repository.save(any(Product.class))).thenThrow(new ProductAlreadyExistsException(product.getProduct(), product.getProductId()));
 
         useCase.execute(List.of(new File("dummy.json")));
@@ -74,7 +75,7 @@ class ProductIngestionUseCaseTest {
         ProductResult result = new ProductResultImpl(product, processingException);
         Future<ProductResult> future = CompletableFuture.completedFuture(result);
 
-        when(fileStreamPort.startStream(anyList())).thenReturn(List.of(future));
+        when(fileStreamPort.startStream(Mockito.<List<File>>any())).thenReturn(List.of(future));
 
         useCase.execute(List.of(new File("arquivo_com_erro.json")));
 
@@ -86,7 +87,7 @@ class ProductIngestionUseCaseTest {
     void deveLogarErroDeThreadAoExecutarFuturo() throws Exception {
         Future<ProductResult> future = mock(Future.class);
         when(future.get()).thenThrow(new InterruptedException("Thread interrompida"));
-        when(fileStreamPort.startStream(anyList())).thenReturn(List.of(future));
+        when(fileStreamPort.startStream(Mockito.<List<File>>any())).thenReturn(List.of(future));
 
         useCase.execute(List.of(new File("qualquer.json")));
 

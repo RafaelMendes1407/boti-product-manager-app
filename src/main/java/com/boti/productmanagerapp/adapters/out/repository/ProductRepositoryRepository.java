@@ -6,7 +6,7 @@ import com.boti.productmanagerapp.adapters.out.jpa.ProductJpaRepository;
 import com.boti.productmanagerapp.application.core.domain.Product;
 import com.boti.productmanagerapp.application.core.exceptions.ProductAlreadyExistsException;
 import com.boti.productmanagerapp.application.core.exceptions.ProductNotFoundException;
-import com.boti.productmanagerapp.application.ports.out.ProductPort;
+import com.boti.productmanagerapp.application.ports.out.ProductRepositoryPort;
 import com.boti.productmanagerapp.utils.mappers.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class ProductRepository implements ProductPort {
+public class ProductRepositoryRepository implements ProductRepositoryPort {
 
     @Autowired
     private ProductJpaRepository productJpaRepository;

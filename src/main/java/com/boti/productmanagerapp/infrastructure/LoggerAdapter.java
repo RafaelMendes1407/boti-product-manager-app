@@ -3,10 +3,7 @@ package com.boti.productmanagerapp.infrastructure;
 import com.boti.productmanagerapp.application.ports.out.LoggerPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-
-@Component
 public class LoggerAdapter implements LoggerPort {
 
     @Override

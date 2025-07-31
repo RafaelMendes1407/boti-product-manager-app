@@ -12,11 +12,11 @@ import java.util.concurrent.Future;
 
 public class ProductIngestionUseCase {
 
-    private final ProductPort repository;
+    private final ProductRepositoryPort repository;
     private final LoggerPort loggerPort;
     private final FileStreamPort fileStreamPort;
 
-    public ProductIngestionUseCase(ProductPort repository, LoggerPort loggerPort, FileStreamPort fileStreamPort) {
+    public ProductIngestionUseCase(ProductRepositoryPort repository, LoggerPort loggerPort, FileStreamPort fileStreamPort) {
         this.repository = repository;
         this.loggerPort = loggerPort;
         this.fileStreamPort = fileStreamPort;
