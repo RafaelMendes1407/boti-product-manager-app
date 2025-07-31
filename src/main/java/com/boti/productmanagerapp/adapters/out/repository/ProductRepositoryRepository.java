@@ -11,6 +11,8 @@ import com.boti.productmanagerapp.utils.mappers.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,14 +25,14 @@ public class ProductRepositoryRepository implements ProductRepositoryPort {
     private ProductJpaRepository productJpaRepository;
 
     @Override
+    @Transactional
     public Product save(Product product) {
         try {
             ProductEntity productEntity = ProductMapper.Instance.toProductEntity(product);
             Product prod =  ProductMapper.Instance.toProduct(this.productJpaRepository.save(productEntity));
             return prod;
         } catch (DataIntegrityViolationException e) {
-            Product existentProduct = this.findByProductName(product.getProduct());
-            throw new ProductAlreadyExistsException(product.getProduct(), existentProduct.getProductId());
+            throw new ProductAlreadyExistsException(product.getProduct());
         } catch (Exception e) {
             throw new DatabasePersistenceException(e.getMessage());
         }
@@ -55,5 +57,16 @@ public class ProductRepositoryRepository implements ProductRepositoryPort {
     @Override
     public List<Product> findByRange(BigDecimal startRange, BigDecimal endRange) {
         return List.of();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Long count() {
+        return productJpaRepository.count();
+    }
+
+    @Override
+    public void flush() {
+        productJpaRepository.flush();
     }
 }

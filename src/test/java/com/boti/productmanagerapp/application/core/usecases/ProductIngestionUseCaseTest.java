@@ -17,7 +17,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 class ProductIngestionUseCaseTest {
@@ -59,7 +58,7 @@ class ProductIngestionUseCaseTest {
         Future<ProductResult> future = CompletableFuture.completedFuture(result);
 
         when(fileStreamPort.startStream(Mockito.<List<File>>any())).thenReturn(List.of(future));
-        when(repository.save(any(Product.class))).thenThrow(new ProductAlreadyExistsException(product.getProduct(), product.getProductId()));
+        when(repository.save(any(Product.class))).thenThrow(new ProductAlreadyExistsException(product.getProduct()));
 
         useCase.execute(List.of(new File("dummy.json")));
 
