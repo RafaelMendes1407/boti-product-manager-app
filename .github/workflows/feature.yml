@@ -130,3 +130,4 @@ jobs:
           labels: |
             automated-pr
             feature
+          draft: false
