@@ -3,13 +3,14 @@ package com.boti.productmanagerapp.application.core.usecases;
 import com.boti.productmanagerapp.adapters.out.batchprocess.ProductResultImpl;
 import com.boti.productmanagerapp.application.core.domain.Product;
 import com.boti.productmanagerapp.application.core.exceptions.ProductAlreadyExistsException;
-import com.boti.productmanagerapp.application.ports.out.FileStreamPort;
-import com.boti.productmanagerapp.application.ports.out.LoggerPort;
-import com.boti.productmanagerapp.application.ports.out.ProductRepositoryPort;
-import com.boti.productmanagerapp.application.ports.out.ProductResult;
+import com.boti.productmanagerapp.application.ports.out.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.io.File;
 import java.util.List;
@@ -21,30 +22,38 @@ import static org.mockito.Mockito.*;
 
 class ProductIngestionUseCaseTest {
 
+    @Mock
     private ProductRepositoryPort repository;
+
+    @Mock
     private LoggerPort loggerPort;
+
+    @Mock
     private FileStreamPort fileStreamPort;
+
+    @Mock
+    private ReadProductFile productFile;
+
+    @InjectMocks
     private ProductIngestionUseCase useCase;
 
     @BeforeEach
     void setUp() {
-        repository = mock(ProductRepositoryPort.class);
-        loggerPort = mock(LoggerPort.class);
-        fileStreamPort = mock(FileStreamPort.class);
-
-        useCase = new ProductIngestionUseCase(repository, loggerPort, fileStreamPort);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void deveProcessarProdutoCorretamente() throws Exception {
+    @DisplayName("Should process product correctly")
+    void shouldProcessProduct() throws Exception {
         Product product = this.createProduct();
         ProductResult result = new ProductResultImpl(product, null);
         Future<ProductResult> future = CompletableFuture.completedFuture(result);
 
         when(fileStreamPort.startStream(Mockito.<List<File>>any())).thenReturn(List.of(future));
         when(repository.save(any(Product.class))).thenReturn(product);
+        when(productFile.getInputDataFiles(anyString())).thenReturn(List.of(new File("dummy.json")));
 
-        useCase.execute(List.of(new File("dummy.json")));
+        useCase.execute("path");
 
         verify(repository, times(1)).save(product);
         verify(loggerPort, times(1)).info(eq(ProductIngestionUseCase.class), contains("Starting"));
@@ -52,22 +61,24 @@ class ProductIngestionUseCaseTest {
     }
 
     @Test
-    void deveLogarQuandoProdutoJaExiste() throws Exception {
+    @DisplayName("Should logs when the product already exists")
+    void shouldLogsWhenProductAlreadyExists() throws Exception {
         Product product = this.createProduct();
         ProductResult result = new ProductResultImpl(product, null);
         Future<ProductResult> future = CompletableFuture.completedFuture(result);
 
         when(fileStreamPort.startStream(Mockito.<List<File>>any())).thenReturn(List.of(future));
         when(repository.save(any(Product.class))).thenThrow(new ProductAlreadyExistsException(product.getProduct()));
-
-        useCase.execute(List.of(new File("dummy.json")));
+        when(productFile.getInputDataFiles(anyString())).thenReturn(List.of(new File("dummy.json")));
+        useCase.execute("path");
 
         verify(repository, times(1)).save(product);
         verify(loggerPort).warn(eq(ProductIngestionUseCase.class), contains("already exists"));
     }
 
     @Test
-    void deveLogarErroAoProcessarArquivo() throws Exception {
+    @DisplayName("Should log error when processing a file with error")
+    void shouldLogErrorWHenProcessFile() throws Exception {
         Product product = this.createProduct();
         Exception processingException = new RuntimeException("Erro na leitura");
 
@@ -75,20 +86,23 @@ class ProductIngestionUseCaseTest {
         Future<ProductResult> future = CompletableFuture.completedFuture(result);
 
         when(fileStreamPort.startStream(Mockito.<List<File>>any())).thenReturn(List.of(future));
+        when(productFile.getInputDataFiles(anyString())).thenReturn(List.of(new File("arquivo_com_erro.json")));
 
-        useCase.execute(List.of(new File("arquivo_com_erro.json")));
+        useCase.execute("path");
 
         verify(loggerPort).warn(eq(ProductIngestionUseCase.class), contains("Erro na leitura"));
         verify(repository, never()).save(any());
     }
 
     @Test
-    void deveLogarErroDeThreadAoExecutarFuturo() throws Exception {
+    @DisplayName("Should Log error when processing future")
+    void shouldLogErrorWhenProcessingFuture() throws Exception {
         Future<ProductResult> future = mock(Future.class);
         when(future.get()).thenThrow(new InterruptedException("Thread interrompida"));
         when(fileStreamPort.startStream(Mockito.<List<File>>any())).thenReturn(List.of(future));
+        when(productFile.getInputDataFiles(anyString())).thenReturn(List.of(new File("qualquer.json")));
 
-        useCase.execute(List.of(new File("qualquer.json")));
+        useCase.execute("path");
 
         verify(loggerPort).error(eq(ProductIngestionUseCase.class), contains("Thread interrompida"), any());
     }

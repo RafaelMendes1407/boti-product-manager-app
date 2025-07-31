@@ -4,7 +4,5 @@ import java.io.File;
 import java.util.List;
 
 public interface ReadProductFile {
-
-    List<File> readFile(String directoryPath);
-
+    List<File> getInputDataFiles(String directoryPath);
 }

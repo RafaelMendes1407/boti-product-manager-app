@@ -13,7 +13,6 @@ public interface ProductRepositoryPort {
     Product findByProductName(String name);
     List<Product> findByRange(BigDecimal startRange, BigDecimal endRange);
     Long count();
-    void flush();
 
 }
 

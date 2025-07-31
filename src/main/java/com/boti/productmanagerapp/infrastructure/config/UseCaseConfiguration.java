@@ -6,6 +6,7 @@ import com.boti.productmanagerapp.application.core.usecases.InsertProductUsecase
 import com.boti.productmanagerapp.application.core.usecases.ProductIngestionUseCase;
 import com.boti.productmanagerapp.application.ports.out.LoggerPort;
 import com.boti.productmanagerapp.application.ports.out.ProductRepositoryPort;
+import com.boti.productmanagerapp.application.ports.out.ReadProductFile;
 import com.boti.productmanagerapp.infrastructure.LoggerAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,7 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public ProductIngestionUseCase ProductIngestionUseCase(ProductRepositoryRepository productRepository, LoggerPort loggerAdapter, FileStreamPortImpl fileStreamPort) {
-        return new ProductIngestionUseCase(productRepository, loggerAdapter, fileStreamPort);
+    public ProductIngestionUseCase ProductIngestionUseCase(ProductRepositoryRepository productRepository, LoggerPort loggerAdapter, FileStreamPortImpl fileStreamPort, ReadProductFile productFile) {
+        return new ProductIngestionUseCase(productRepository, loggerAdapter, fileStreamPort, productFile);
     }
 }

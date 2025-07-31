@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -41,6 +42,7 @@ public class FileStreamPortImpl implements FileStreamPort {
     }
 
     public void finishStreamFile() {
+        if (Objects.isNull(executor)) return;
         executor.shutdown();
     }
 

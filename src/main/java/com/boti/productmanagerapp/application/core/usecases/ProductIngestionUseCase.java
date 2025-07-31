@@ -15,16 +15,19 @@ public class ProductIngestionUseCase {
     private final ProductRepositoryPort repository;
     private final LoggerPort log;
     private final FileStreamPort fileStreamPort;
+    private final ReadProductFile productFile;
 
-    public ProductIngestionUseCase(ProductRepositoryPort repository, LoggerPort log, FileStreamPort fileStreamPort) {
+    public ProductIngestionUseCase(ProductRepositoryPort repository, LoggerPort log, FileStreamPort fileStreamPort, ReadProductFile productFile) {
         this.repository = repository;
         this.log = log;
         this.fileStreamPort = fileStreamPort;
+        this.productFile = productFile;
     }
 
-    public void execute(List<File> files) {
-        log.info(ProductIngestionUseCase.class, "Starting product Ingestion");
+    public void execute(String path) {
+        log.info(ProductIngestionUseCase.class, "Starting product Ingestion data process");
         try {
+            List<File> files = productFile.getInputDataFiles(path);
             List<Future<ProductResult>> futures = fileStreamPort.startStream(files);
 
             for (Future<ProductResult> f : futures) {
@@ -35,9 +38,7 @@ public class ProductIngestionUseCase {
                         Product product = productResult.getProduct();
 
                         try {
-
                             product = repository.save(product);
-
                         } catch (ProductAlreadyExistsException ex) {
                             log.warn(ProductIngestionUseCase.class, String.format("Product %s already exists", product.getProduct()));
                         }
@@ -49,6 +50,7 @@ public class ProductIngestionUseCase {
                     log.warn(
                             ProductIngestionUseCase.class,
                             String.format("File processor error: %s", ex.getMessage()));
+
                 } catch (ExecutionException | InterruptedException e) {
                     log.error(
                             ProductIngestionUseCase.class,

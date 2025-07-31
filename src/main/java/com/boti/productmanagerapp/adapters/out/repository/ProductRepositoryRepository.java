@@ -65,8 +65,4 @@ public class ProductRepositoryRepository implements ProductRepositoryPort {
         return productJpaRepository.count();
     }
 
-    @Override
-    public void flush() {
-        productJpaRepository.flush();
-    }
 }
