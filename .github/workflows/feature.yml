@@ -25,15 +25,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Gradle Build and Tests
-        run: ./gradlew clean test --no-daemon
-
-      - name: Upload JaCoCo Execution Data (.exec)
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-exec-data
-
-
-          path: build/jacoco/test.exec
+        run: ./gradlew clean build
 
   coverage:
     name: Generate JaCoCo Coverage Report
