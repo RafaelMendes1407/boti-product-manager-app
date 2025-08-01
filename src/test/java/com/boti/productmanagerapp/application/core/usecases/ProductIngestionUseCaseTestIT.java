@@ -4,7 +4,7 @@ import com.boti.productmanagerapp.application.core.domain.Product;
 import com.boti.productmanagerapp.application.ports.out.FileStreamPort;
 import com.boti.productmanagerapp.application.ports.out.LoggerPort;
 import com.boti.productmanagerapp.application.ports.out.ProductRepositoryPort;
-import com.boti.productmanagerapp.application.ports.out.ReadProductFile;
+import com.boti.productmanagerapp.application.ports.in.ReadProductFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

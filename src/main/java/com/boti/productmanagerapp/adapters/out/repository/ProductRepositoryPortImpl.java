@@ -11,7 +11,6 @@ import com.boti.productmanagerapp.application.ports.out.ProductRepositoryPort;
 import com.boti.productmanagerapp.utils.mappers.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

@@ -3,6 +3,7 @@ package com.boti.productmanagerapp.application.core.usecases;
 import com.boti.productmanagerapp.adapters.out.batchprocess.ProductResultImpl;
 import com.boti.productmanagerapp.application.core.domain.Product;
 import com.boti.productmanagerapp.application.core.exceptions.ProductAlreadyExistsException;
+import com.boti.productmanagerapp.application.ports.in.ReadProductFile;
 import com.boti.productmanagerapp.application.ports.out.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
