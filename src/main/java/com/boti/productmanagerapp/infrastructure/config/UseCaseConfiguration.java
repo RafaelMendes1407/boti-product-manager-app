@@ -1,7 +1,8 @@
 package com.boti.productmanagerapp.infrastructure.config;
 
 import com.boti.productmanagerapp.adapters.out.batchprocess.FileStreamPortImpl;
-import com.boti.productmanagerapp.adapters.out.repository.ProductRepositoryRepository;
+import com.boti.productmanagerapp.adapters.out.repository.ProductRepositoryPortImpl;
+import com.boti.productmanagerapp.application.core.usecases.FindProductByIdUsecase;
 import com.boti.productmanagerapp.application.core.usecases.InsertProductUsecase;
 import com.boti.productmanagerapp.application.core.usecases.ProductIngestionUseCase;
 import com.boti.productmanagerapp.application.core.usecases.ProductQueryUsecase;
@@ -26,12 +27,17 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public ProductIngestionUseCase ProductIngestionUseCase(ProductRepositoryRepository productRepository, LoggerPort loggerAdapter, FileStreamPortImpl fileStreamPort, ReadProductFile productFile) {
+    public ProductIngestionUseCase ProductIngestionUseCase(ProductRepositoryPortImpl productRepository, LoggerPort loggerAdapter, FileStreamPortImpl fileStreamPort, ReadProductFile productFile) {
         return new ProductIngestionUseCase(productRepository, loggerAdapter, fileStreamPort, productFile);
     }
 
     @Bean
     public ProductQueryUsecase productQueryUsecase(LoggerPort loggerPort, ProductRepositoryPort productRepository) {
         return new ProductQueryUsecase(loggerPort, productRepository);
+    }
+
+    @Bean
+    public FindProductByIdUsecase findProductByIdUsecase(LoggerPort log, ProductRepositoryPort productRepositoryPort) {
+        return new FindProductByIdUsecase(log, productRepositoryPort);
     }
 }
