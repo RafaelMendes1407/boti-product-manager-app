@@ -3,6 +3,7 @@ package com.boti.productmanagerapp.adapters.out.repository;
 import com.boti.productmanagerapp.adapters.out.entities.ProductEntity;
 import com.boti.productmanagerapp.adapters.out.exceptions.DatabasePersistenceException;
 import com.boti.productmanagerapp.adapters.out.jpa.ProductJpaRepository;
+import com.boti.productmanagerapp.application.core.domain.PageResult;
 import com.boti.productmanagerapp.application.core.domain.Product;
 import com.boti.productmanagerapp.application.core.exceptions.ProductAlreadyExistsException;
 import com.boti.productmanagerapp.application.core.exceptions.ProductNotFoundException;
@@ -10,9 +11,7 @@ import com.boti.productmanagerapp.application.ports.out.ProductRepositoryPort;
 import com.boti.productmanagerapp.utils.mappers.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +51,7 @@ public class ProductRepositoryPortImpl implements ProductRepositoryPort {
     }
 
     @Override
-    public Page<ProductEntity> queryByNameOrPriceRange(String name, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
+    public PageResult<Product> queryByNameOrPriceRange(String name, BigDecimal minPrice, BigDecimal maxPrice, int pageNumber, int pageSize) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<ProductEntity> cq = cb.createQuery(ProductEntity.class);
         Root<ProductEntity> root = cq.from(ProductEntity.class);
@@ -74,8 +73,8 @@ public class ProductRepositoryPortImpl implements ProductRepositoryPort {
         cq.where(cb.and(predicates.toArray(new Predicate[0])));
 
         TypedQuery<ProductEntity> query = entityManager.createQuery(cq);
-        query.setFirstResult((int) pageable.getOffset());
-        query.setMaxResults(pageable.getPageSize());
+        query.setFirstResult(pageNumber);
+        query.setMaxResults(pageSize);
 
         List<ProductEntity> resultList = query.getResultList();
 
@@ -85,7 +84,7 @@ public class ProductRepositoryPortImpl implements ProductRepositoryPort {
 
         Long total = entityManager.createQuery(countQuery).getSingleResult();
 
-        return new PageImpl<>(resultList, pageable, total);
+        return new PageResult<>(resultList.stream().map(ProductMapper.Instance::toProduct).collect(Collectors.toList()), pageNumber, pageSize, total);
     }
 
     @Override
