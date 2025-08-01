@@ -19,9 +19,6 @@ public class DataIngestionConfig implements ApplicationListener<ContextRefreshed
     @Autowired
     private ProductIngestionUseCase productIngestionUseCase;
 
-    @Value("${app.ingestion.pool-size}")
-    private int ingestionPoolSize;
-
     @Value("${app.ingestion.folder.location}")
     private String filePath;
 
