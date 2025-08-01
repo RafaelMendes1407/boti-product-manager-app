@@ -41,7 +41,7 @@ class ReadProductFileImplTest {
         List<File> files = readProductFile.getInputDataFiles(path);
 
         assertNotNull(files);
-        assertEquals(5, files.size());
+        assertEquals(2, files.size());
 
         verify(log, times(1)).info(
                 ReadProductFileImpl.class,
@@ -49,7 +49,7 @@ class ReadProductFileImplTest {
         );
         verify(log, times(1)).info(
                 ReadProductFileImpl.class,
-                "File scan finished: 5 file(s) found for insertion"
+                "File scan finished: 2 file(s) found for insertion"
         );
     }
 

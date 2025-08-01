@@ -47,6 +47,7 @@ Os endpoints da API podem ser verificados através do link depois que a aplicaç
 - 🔍 Consulta de produtos com filtro por nome ou preço (`GET /v1/products`)
 - 🔎 Busca de produto por ID (`GET /v1/products/{id}`)
 - 📥 Ingestão de arquivos JSON em lote na inicialização
+- ⚛️ Reativo a novos arquivos inseridos na pasta durante a execução
 
 ## 📁 Estrutura do Projeto
 ```

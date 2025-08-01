@@ -7,6 +7,7 @@ import com.boti.productmanagerapp.application.ports.in.ReadProductFile;
 import com.boti.productmanagerapp.application.ports.out.*;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -25,10 +26,24 @@ public class ProductIngestionUseCase {
         this.productFile = productFile;
     }
 
+
     public void execute(String path) {
-        log.info(ProductIngestionUseCase.class, "Starting product Ingestion data process");
         try {
             List<File> files = productFile.getInputDataFiles(path);
+            processFiles(files);
+        } catch (FileProductProcessorException e) {
+            log.error(ProductIngestionUseCase.class, String.format("File processor error: %s", e.getMessage()));
+        }
+    }
+
+    public void execute(File file) {
+        processFiles(Collections.singletonList(file));
+    }
+
+    private void processFiles(List<File> files) {
+        log.info(ProductIngestionUseCase.class, "Starting product Ingestion data process");
+
+        try {
             List<Future<ProductResult>> futures = fileStreamPort.startStream(files);
 
             for (Future<ProductResult> f : futures) {
@@ -43,25 +58,20 @@ public class ProductIngestionUseCase {
                         } catch (ProductAlreadyExistsException ex) {
                             log.warn(ProductIngestionUseCase.class, String.format("Product %s already exists", product.getProduct()));
                         }
-                        continue;
+
+                    } else {
+                        Exception ex = productResult.getException();
+                        log.warn(ProductIngestionUseCase.class, String.format("File processor error: %s", ex.getMessage()));
                     }
-
-                    Exception ex = productResult.getException();
-
-                    log.warn(
-                            ProductIngestionUseCase.class,
-                            String.format("File processor error: %s", ex.getMessage()));
 
                 } catch (ExecutionException | InterruptedException e) {
                     log.error(
                             ProductIngestionUseCase.class,
-                            String.format("File processor error: %s", e.getMessage()), new FileProductProcessorException(e.getMessage()));
+                            String.format("File processor error: %s", e.getMessage()),
+                            new FileProductProcessorException(e.getMessage()));
                 }
             }
-        } catch (FileProductProcessorException e) {
-            log.error(
-                    ProductIngestionUseCase.class,
-                    String.format("File processor error: %s", e.getMessage()));
+
         } finally {
             log.info(ProductIngestionUseCase.class, "Product Ingestion finished");
             fileStreamPort.finishStreamFile();

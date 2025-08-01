@@ -14,9 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -26,23 +24,21 @@ public class FileStreamPortImpl implements FileStreamPort {
     private LoggerPort log;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    ExecutorService executor;
 
     @Override
     public List<Future<ProductResult>> startStream(List<File> files) {
         log.info(FileStreamPortImpl.class, "Starting file Streaming...");
-        return files.stream()
+        return files.parallelStream()
                 .flatMap(file -> processFileStreaming(file).stream())
                 .collect(Collectors.toList());
     }
 
     public void finishStreamFile() {
-        if (Objects.isNull(executor)) return;
-        executor.shutdown();
+        ExecutorServiceSingleton.shutdown();
     }
 
     private List<Future<ProductResult>> processFileStreaming(File file) {
-        this.executor = Executors.newFixedThreadPool(4);
+        ExecutorService executor = ExecutorServiceSingleton.getInstance();
         List<Future<ProductResult>> futures = new ArrayList<>();
 
         try (JsonParser parser = objectMapper.getFactory().createParser(file)) {
@@ -61,12 +57,11 @@ public class FileStreamPortImpl implements FileStreamPort {
                 Product product = objectMapper.readValue(parser, Product.class);
                 futures.add(executor.submit(() -> new ProductResultImpl(product, null)));
             }
-
+            log.info(FileStreamPortImpl.class, String.format("File %s read finished", file.getName()));
         } catch (IOException e) {
             log.error(FileStreamPortImpl.class, String.format("Erro ao fazer streaming do arquivo %s: error: %s", file.getName(), e.getMessage()), e);
             futures.add(executor.submit(() -> new ProductResultImpl(null, e)));
         }
-
         return futures;
     }
 }
