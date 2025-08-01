@@ -10,7 +10,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("production")
+@Profile("default")
 public class DataIngestionConfig implements ApplicationListener<ContextRefreshedEvent> {
 
     @Autowired
@@ -22,7 +22,7 @@ public class DataIngestionConfig implements ApplicationListener<ContextRefreshed
     @Value("${app.ingestion.pool-size}")
     private int ingestionPoolSize;
 
-    @Value("${app.ingestion.pool-size}")
+    @Value("${app.ingestion.folder.location}")
     private String filePath;
 
     @Override

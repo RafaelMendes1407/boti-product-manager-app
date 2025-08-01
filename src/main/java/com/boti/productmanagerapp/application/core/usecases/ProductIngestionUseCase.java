@@ -57,6 +57,10 @@ public class ProductIngestionUseCase {
                             String.format("File processor error: %s", e.getMessage()), new FileProductProcessorException(e.getMessage()));
                 }
             }
+        } catch (FileProductProcessorException e) {
+            log.error(
+                    ProductIngestionUseCase.class,
+                    String.format("File processor error: %s", e.getMessage()));
         } finally {
             log.info(ProductIngestionUseCase.class, "Product Ingestion finished");
             fileStreamPort.finishStreamFile();

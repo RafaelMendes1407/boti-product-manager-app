@@ -2,10 +2,12 @@ package com.boti.productmanagerapp.adapters.out.batchprocess;
 
 import com.boti.productmanagerapp.application.core.domain.Product;
 import com.boti.productmanagerapp.application.ports.out.FileStreamPort;
+import com.boti.productmanagerapp.application.ports.out.LoggerPort;
 import com.boti.productmanagerapp.application.ports.out.ProductResult;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -20,22 +22,15 @@ import java.util.stream.Collectors;
 
 @Component
 public class FileStreamPortImpl implements FileStreamPort {
+    @Autowired
+    private LoggerPort log;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     ExecutorService executor;
 
-//    @Override
-//    public List<Future<ProductResult>> startStream(List<File> files) {
-//
-//        return files.stream()
-//                .map(file -> executor.submit(() -> {
-//                    return processFile(file);
-//                }))
-//                .collect(Collectors.toList());
-//    }
-
     @Override
     public List<Future<ProductResult>> startStream(List<File> files) {
+        log.info(FileStreamPortImpl.class, "Starting file Streaming...");
         return files.stream()
                 .flatMap(file -> processFileStreaming(file).stream())
                 .collect(Collectors.toList());
@@ -46,17 +41,6 @@ public class FileStreamPortImpl implements FileStreamPort {
         executor.shutdown();
     }
 
-//    private ProductResult processFile(File file) {
-//        try {
-//            System.out.println("Processando: " + file.getName());
-//            ProductWrapper product =  objectMapper.readValue(file, ProductWrapper.class);
-//            return new ProductResultImpl(product.getData(), null);
-//        } catch (IOException e) {
-//            System.err.println("Erro ao ler o arquivo " + file.getName() + ": " + e.getMessage());
-//            return new ProductResultImpl(null, e);
-//        }
-//    }
-
     private List<Future<ProductResult>> processFileStreaming(File file) {
         this.executor = Executors.newFixedThreadPool(4);
         List<Future<ProductResult>> futures = new ArrayList<>();
@@ -64,11 +48,11 @@ public class FileStreamPortImpl implements FileStreamPort {
         try (JsonParser parser = objectMapper.getFactory().createParser(file)) {
 
             while (!parser.isClosed() && parser.nextToken() != JsonToken.FIELD_NAME) {
-                // busca o campo "data"
+                // searchs for "data" field
             }
 
             if (!"data".equals(parser.getCurrentName())) {
-                throw new IOException("Campo 'data' não encontrado no arquivo " + file.getName());
+                throw new IOException("Field data not found: " + file.getName());
             }
 
             parser.nextToken();
@@ -79,7 +63,7 @@ public class FileStreamPortImpl implements FileStreamPort {
             }
 
         } catch (IOException e) {
-            System.err.println("Erro ao fazer streaming do arquivo " + file.getName() + ": " + e.getMessage());
+            log.error(FileStreamPortImpl.class, String.format("Erro ao fazer streaming do arquivo %s: error: %s", file.getName(), e.getMessage()), e);
             futures.add(executor.submit(() -> new ProductResultImpl(null, e)));
         }
 

@@ -29,4 +29,6 @@ public interface ProductMapper {
     @Mapping(source ="productId", target = "id" )
     ProductResponse toProductResponse(Product product);
 
+    ProductResponse toProductResponse(ProductEntity productEntity);
+
 }

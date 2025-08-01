@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 
 @Entity
@@ -21,9 +22,12 @@ public class ProductEntity {
     private long id;
     private String product;
     private long quantity;
-    private String price;
+    private BigDecimal price;
     private String type;
     private String industry;
     private String origin;
 
+    public void setPrice(String price) {
+        this.price = new BigDecimal(price.replace("$", ""));
+    }
 }

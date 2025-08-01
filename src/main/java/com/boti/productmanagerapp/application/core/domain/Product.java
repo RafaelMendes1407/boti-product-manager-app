@@ -65,6 +65,10 @@ public class Product {
         this.price = price;
     }
 
+    public void setPrice(BigDecimal price) {
+        this.price = String.format("$%s", price.toString());
+    }
+
     public String getType() {
         return type;
     }

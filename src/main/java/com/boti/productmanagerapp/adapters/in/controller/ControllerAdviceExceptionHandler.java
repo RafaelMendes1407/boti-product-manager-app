@@ -4,6 +4,7 @@ import com.boti.productmanagerapp.adapters.in.web.response.ErrorResponse;
 import com.boti.productmanagerapp.application.core.exceptions.ProductAlreadyExistsException;
 import com.boti.productmanagerapp.application.core.exceptions.ProductNotFoundException;
 import com.boti.productmanagerapp.application.ports.out.LoggerPort;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class ControllerAdviceExceptionHandler {
 
+    @Autowired
     private LoggerPort loggerPort;
 
     @ExceptionHandler(ProductAlreadyExistsException.class)

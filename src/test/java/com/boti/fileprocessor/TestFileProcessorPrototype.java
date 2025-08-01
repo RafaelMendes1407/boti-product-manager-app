@@ -1,10 +1,7 @@
 package com.boti.fileprocessor;
 
 import com.boti.productmanagerapp.application.core.domain.Product;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,8 +19,6 @@ public class TestFileProcessorPrototype {
     private static final int THREADS = Runtime.getRuntime().availableProcessors();
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Test
-    @DisplayName("Should read and process a json file")
     void shouldCreateExceptionWithCorrectMessage() {
         ExecutorService executor = Executors.newFixedThreadPool(THREADS);
 

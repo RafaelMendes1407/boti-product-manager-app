@@ -5,6 +5,8 @@ import com.boti.productmanagerapp.application.core.domain.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("ProductMapper Tests")
@@ -30,7 +32,7 @@ class ProductMapperTest {
         assertEquals(product.getProductId(), entity.getId(), "Product ID should be mapped correctly");
         assertEquals(product.getProduct(), entity.getProduct(), "Product name should be mapped correctly");
         assertEquals(product.getQuantity(), entity.getQuantity(), "Quantity should be mapped correctly");
-        assertEquals(0, product.getPrice().compareTo(entity.getPrice()), "Price (BigDecimal) should be mapped correctly");
+        assertEquals(0, product.getPrice().compareTo(String.format("$%s",entity.getPrice().toString())), "Price (BigDecimal) should be mapped correctly");
         assertEquals(product.getType(), entity.getType(), "Type should be mapped correctly");
         assertEquals(product.getIndustry(), entity.getIndustry(), "Industry should be mapped correctly");
         assertEquals(product.getOrigin(), entity.getOrigin(), "Origin should be mapped correctly");
@@ -44,7 +46,7 @@ class ProductMapperTest {
                 1L,
                 "RTIX",
                 50L,
-                "$1500.50",
+                new BigDecimal("1500.50"),
                 "Computers",
                 "IT",
                 "USA"
@@ -58,7 +60,7 @@ class ProductMapperTest {
         assertEquals(entity.getId(), product.getProductId(), "Product ID should be mapped correctly");
         assertEquals(entity.getProduct(), product.getProduct(), "Product name should be mapped correctly");
         assertEquals(entity.getQuantity(), product.getQuantity(), "Quantity should be mapped correctly");
-        assertEquals(0, entity.getPrice().compareTo(product.getPrice()), "Price (BigDecimal) should be mapped correctly");
+        assertEquals(0, entity.getPrice().compareTo(new BigDecimal(product.getPrice().replace("$", ""))), "Price (BigDecimal) should be mapped correctly");
         assertEquals(entity.getType(), product.getType(), "Type should be mapped correctly");
         assertEquals(entity.getIndustry(), product.getIndustry(), "Industry should be mapped correctly");
         assertEquals(entity.getOrigin(), product.getOrigin(), "Origin should be mapped correctly");
@@ -101,7 +103,7 @@ class ProductMapperTest {
                 1L,
                 "Old Widget",
                 150L,
-                "$40.00",
+                new BigDecimal("40.00"),
                 "Old Type",
                 "Old Industry",
                 "Old Origin"
@@ -113,7 +115,7 @@ class ProductMapperTest {
         assertEquals(1L, existingEntity.getId(), "ProductId should remain unchanged after update");
         assertEquals(product.getProduct(), existingEntity.getProduct(), "Product name should be updated");
         assertEquals(product.getQuantity(), existingEntity.getQuantity(), "Quantity should be updated");
-        assertEquals(0, product.getPrice().compareTo(existingEntity.getPrice()), "Price should be updated");
+        assertEquals(0, product.getPrice().compareTo(String.format("$%s",existingEntity.getPrice().toString())), "Price should be updated");
         assertEquals(product.getType(), existingEntity.getType(), "Type should be updated");
         assertEquals(product.getIndustry(), existingEntity.getIndustry(), "Industry should be updated");
         assertEquals(product.getOrigin(), existingEntity.getOrigin(), "Origin should be updated");

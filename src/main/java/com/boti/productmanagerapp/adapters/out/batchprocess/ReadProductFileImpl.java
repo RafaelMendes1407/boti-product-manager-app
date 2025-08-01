@@ -1,5 +1,6 @@
 package com.boti.productmanagerapp.adapters.out.batchprocess;
 
+import com.boti.productmanagerapp.application.core.exceptions.FileProductProcessorException;
 import com.boti.productmanagerapp.application.ports.out.LoggerPort;
 import com.boti.productmanagerapp.application.ports.out.ReadProductFile;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class ReadProductFileImpl implements ReadProductFile {
         File[] files = folder.listFiles((dir, name) -> name.endsWith(".json"));
 
         if (files == null) {
-            throw new RuntimeException("Error while scanning for files: invalid files or directory.");
+            throw new FileProductProcessorException("Error while scanning for files: invalid files or directory.");
         }
         log.info(ReadProductFileImpl.class, String.format("File scan finished: %d file(s) found for insertion", files.length));
         return Arrays.asList(files);

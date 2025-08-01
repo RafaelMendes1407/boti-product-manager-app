@@ -131,7 +131,7 @@ class ReadProductFileImplTest {
             readProductFile.getInputDataFiles(invalidPath);
         });
 
-        assertEquals("Error while scanning for files: invalid files or directory.", exception.getMessage());
+        assertEquals("Error processing product error: Error while scanning for files: invalid files or directory.", exception.getMessage());
 
         verify(log, times(1)).info(
                 ReadProductFileImpl.class,
