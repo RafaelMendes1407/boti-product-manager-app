@@ -9,9 +9,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.concurrent.ExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +41,10 @@ class ProductIngestionUseCaseTestIT {
     @Autowired
     private ReadProductFile readProductFile;
 
+    @Autowired
+    @Qualifier("insertExecutor")
+    private ExecutorService executor;
+
     @BeforeEach
     void setUp() {
         this.productRepository.deleteAll();
@@ -47,7 +54,7 @@ class ProductIngestionUseCaseTestIT {
     @DisplayName("Should read and process a json file")
     void shouldReadAndSaveJsonDataInDatabase() {
         long jsonTotalProductsFileData1 = 31;
-        ProductIngestionUseCase productIngestionUseCase = new ProductIngestionUseCase(productRepository, log, fileStreamPort, readProductFile);
+        ProductIngestionUseCase productIngestionUseCase = new ProductIngestionUseCase(productRepository, log, fileStreamPort, readProductFile,executor);
         productIngestionUseCase.execute("src/test/resources/data_test_1");
         assertEquals(jsonTotalProductsFileData1, productRepository.count());
     }
@@ -56,7 +63,7 @@ class ProductIngestionUseCaseTestIT {
     @DisplayName("Should read and process 2 json files and save only products that doesn't exists")
     void shouldReadAndSaveOnlyNewProducts() {
         long jsonTotalProductsFileData1 = 31;
-        ProductIngestionUseCase productIngestionUseCase = new ProductIngestionUseCase(productRepository, log, fileStreamPort, readProductFile);
+        ProductIngestionUseCase productIngestionUseCase = new ProductIngestionUseCase(productRepository, log, fileStreamPort, readProductFile, executor);
         productIngestionUseCase.execute("src/test/resources/data_test_2");
 
         assertEquals(jsonTotalProductsFileData1, productRepository.count());

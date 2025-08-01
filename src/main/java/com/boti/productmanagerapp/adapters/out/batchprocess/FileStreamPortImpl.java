@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -20,10 +21,17 @@ import java.util.stream.Collectors;
 
 @Component
 public class FileStreamPortImpl implements FileStreamPort {
-    @Autowired
-    private LoggerPort log;
+
+    private final LoggerPort log;
+    private final ExecutorService executor;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    public FileStreamPortImpl(LoggerPort log, @Qualifier("fileReaderExecutor") ExecutorService executorService) {
+        this.log = log;
+        this.executor = executorService;
+    }
 
     @Override
     public List<Future<ProductResult>> startStream(List<File> files) {
@@ -33,12 +41,7 @@ public class FileStreamPortImpl implements FileStreamPort {
                 .collect(Collectors.toList());
     }
 
-    public void finishStreamFile() {
-        ExecutorServiceSingleton.shutdown();
-    }
-
     private List<Future<ProductResult>> processFileStreaming(File file) {
-        ExecutorService executor = ExecutorServiceSingleton.getInstance();
         List<Future<ProductResult>> futures = new ArrayList<>();
 
         try (JsonParser parser = objectMapper.getFactory().createParser(file)) {
