@@ -2,7 +2,7 @@ package com.boti.productmanagerapp.adapters.out.batchprocess;
 
 import com.boti.productmanagerapp.application.core.exceptions.FileProductProcessorException;
 import com.boti.productmanagerapp.application.ports.out.LoggerPort;
-import com.boti.productmanagerapp.application.ports.out.ReadProductFile;
+import com.boti.productmanagerapp.application.ports.in.ReadProductFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

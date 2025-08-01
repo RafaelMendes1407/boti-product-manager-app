@@ -3,6 +3,7 @@ package com.boti.productmanagerapp.application.core.usecases;
 import com.boti.productmanagerapp.application.core.domain.Product;
 import com.boti.productmanagerapp.application.core.exceptions.FileProductProcessorException;
 import com.boti.productmanagerapp.application.core.exceptions.ProductAlreadyExistsException;
+import com.boti.productmanagerapp.application.ports.in.ReadProductFile;
 import com.boti.productmanagerapp.application.ports.out.*;
 
 import java.io.File;
