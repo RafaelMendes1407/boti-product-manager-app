@@ -10,8 +10,11 @@ import com.boti.productmanagerapp.application.ports.out.LoggerPort;
 import com.boti.productmanagerapp.application.ports.out.ProductRepositoryPort;
 import com.boti.productmanagerapp.application.ports.in.ReadProductFile;
 import com.boti.productmanagerapp.infrastructure.LoggerAdapter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.concurrent.ExecutorService;
 
 @Configuration
 public class UseCaseConfiguration {
@@ -27,8 +30,8 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public ProductIngestionUseCase productIngestionUseCase(ProductRepositoryPortImpl productRepository, LoggerPort loggerAdapter, FileStreamPortImpl fileStreamPort, ReadProductFile productFile) {
-        return new ProductIngestionUseCase(productRepository, loggerAdapter, fileStreamPort, productFile);
+    public ProductIngestionUseCase productIngestionUseCase(ProductRepositoryPortImpl productRepository, LoggerPort loggerAdapter, FileStreamPortImpl fileStreamPort, ReadProductFile productFile, @Qualifier("insertExecutor")ExecutorService executor) {
+        return new ProductIngestionUseCase(productRepository, loggerAdapter, fileStreamPort, productFile, executor);
     }
 
     @Bean

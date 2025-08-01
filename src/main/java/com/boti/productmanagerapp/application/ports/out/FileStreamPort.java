@@ -7,6 +7,5 @@ import java.util.concurrent.Future;
 public interface FileStreamPort {
 
     List<Future<ProductResult>> startStream(List<File> files);
-    void finishStreamFile();
 
 }
