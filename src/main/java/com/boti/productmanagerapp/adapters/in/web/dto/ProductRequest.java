@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class ProductRequest {
 
     @NotBlank(message = "Product identifier cannot be empty")
-    private String product; // Corresponde ao campo 'product' do JSON
+    private String product;
     @NotBlank(message = "Type cannot be empty")
     private String type;
     @NotNull(message = "Price cannot be null")

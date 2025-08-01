@@ -12,8 +12,19 @@ public class Product {
     private String industry;
     private String origin;
 
+    public Product() {}
+
     public Product(long productId, String product, long quantity, String price, String type, String industry, String origin) {
         this.productId = productId;
+        this.product = product;
+        this.quantity = quantity;
+        this.price = price;
+        this.type = type;
+        this.industry = industry;
+        this.origin = origin;
+    }
+
+    public Product(String product, long quantity, String price, String type, String industry, String origin) {
         this.product = product;
         this.quantity = quantity;
         this.price = price;
@@ -52,6 +63,10 @@ public class Product {
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = String.format("$%s", price.toString());
     }
 
     public String getType() {

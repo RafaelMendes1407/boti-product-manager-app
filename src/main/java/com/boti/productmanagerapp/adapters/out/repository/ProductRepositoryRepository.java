@@ -1,0 +1,118 @@
+package com.boti.productmanagerapp.adapters.out.repository;
+
+import com.boti.productmanagerapp.adapters.out.entities.ProductEntity;
+import com.boti.productmanagerapp.adapters.out.exceptions.DatabasePersistenceException;
+import com.boti.productmanagerapp.adapters.out.jpa.ProductJpaRepository;
+import com.boti.productmanagerapp.application.core.domain.Product;
+import com.boti.productmanagerapp.application.core.exceptions.ProductAlreadyExistsException;
+import com.boti.productmanagerapp.application.core.exceptions.ProductNotFoundException;
+import com.boti.productmanagerapp.application.ports.out.ProductRepositoryPort;
+import com.boti.productmanagerapp.utils.mappers.ProductMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Component
+public class ProductRepositoryRepository implements ProductRepositoryPort {
+
+    @Autowired
+    private ProductJpaRepository productJpaRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @Override
+    @Transactional
+    public Product save(Product product) {
+        try {
+            ProductEntity productEntity = ProductMapper.Instance.toProductEntity(product);
+            Product prod =  ProductMapper.Instance.toProduct(this.productJpaRepository.save(productEntity));
+            return prod;
+        } catch (DataIntegrityViolationException e) {
+            throw new ProductAlreadyExistsException(product.getProduct());
+        } catch (Exception e) {
+            throw new DatabasePersistenceException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Page<ProductEntity> queryByNameOrPriceRange(String name, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProductEntity> cq = cb.createQuery(ProductEntity.class);
+        Root<ProductEntity> root = cq.from(ProductEntity.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (name != null) {
+            predicates.add(cb.like(cb.lower(root.get("product")), "%" + name.toLowerCase() + "%"));
+        }
+
+        if (minPrice != null) {
+            predicates.add(cb.ge(root.get("price"), minPrice));
+        }
+
+        if (maxPrice != null) {
+            predicates.add(cb.le(root.get("price"), maxPrice));
+        }
+
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        TypedQuery<ProductEntity> query = entityManager.createQuery(cq);
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        List<ProductEntity> resultList = query.getResultList();
+
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<ProductEntity> countRoot = countQuery.from(ProductEntity.class);
+        countQuery.select(cb.count(countRoot)).where(cb.and(predicates.toArray(new Predicate[0])));
+
+        Long total = entityManager.createQuery(countQuery).getSingleResult();
+
+        return new PageImpl<>(resultList, pageable, total);
+    }
+
+    @Override
+    public Optional<Product> findByProductId(long id) {
+
+        return Optional.empty();
+    }
+
+    @Override
+    public Product findByProductName(String name) {
+        Optional<ProductEntity> productEntityOptional = this.productJpaRepository.findByProduct(name);
+        ProductEntity foundEntity = productEntityOptional.orElseThrow(
+                () -> new ProductNotFoundException(name)
+        );
+
+        return ProductMapper.Instance.toProduct(foundEntity);
+    }
+
+    @Override
+    public List<Product> findByRange(BigDecimal startRange, BigDecimal endRange) {
+        return List.of();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Long count() {
+        return productJpaRepository.count();
+    }
+
+}
