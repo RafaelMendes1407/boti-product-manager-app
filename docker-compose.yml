@@ -22,7 +22,6 @@ services:
       DATASOURCE_URL: jdbc:postgresql://db:5432/product_manager
       DATASOURCE_USERNAME: product_manager
       DATASOURCE_PASSWORD: localpassword
-      INGESTION_POOL_SIZE: 4
       INGESTION_FOLDER_LOCATION: /opt/app/massa
     ports:
       - "8080:8080"

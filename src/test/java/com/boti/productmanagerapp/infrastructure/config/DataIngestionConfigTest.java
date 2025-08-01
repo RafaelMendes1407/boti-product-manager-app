@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(properties = {
         "app.ingestion.folder.location=src/test/resources/data_test_1",
-        "app.ingestion.pool-size=4"
 }, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ActiveProfiles("default")
 @TestPropertySource(locations = "classpath:application-test.properties")
