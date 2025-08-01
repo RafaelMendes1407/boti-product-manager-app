@@ -5,6 +5,7 @@ import com.boti.productmanagerapp.application.ports.out.FileStreamPort;
 import com.boti.productmanagerapp.application.ports.out.LoggerPort;
 import com.boti.productmanagerapp.application.ports.out.ProductRepositoryPort;
 import com.boti.productmanagerapp.application.ports.out.ReadProductFile;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,11 @@ class ProductIngestionUseCaseTestIT {
 
     @Autowired
     private ReadProductFile readProductFile;
+
+    @BeforeEach
+    void setUp() {
+        this.productRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("Should read and process a json file")

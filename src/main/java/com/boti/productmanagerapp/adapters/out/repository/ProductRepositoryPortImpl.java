@@ -26,10 +26,10 @@ import javax.persistence.criteria.Root;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
-public class ProductRepositoryRepository implements ProductRepositoryPort {
+public class ProductRepositoryPortImpl implements ProductRepositoryPort {
 
     @Autowired
     private ProductJpaRepository productJpaRepository;
@@ -89,30 +89,32 @@ public class ProductRepositoryRepository implements ProductRepositoryPort {
     }
 
     @Override
-    public Optional<Product> findByProductId(long id) {
-
-        return Optional.empty();
-    }
-
-    @Override
-    public Product findByProductName(String name) {
-        Optional<ProductEntity> productEntityOptional = this.productJpaRepository.findByProduct(name);
-        ProductEntity foundEntity = productEntityOptional.orElseThrow(
-                () -> new ProductNotFoundException(name)
-        );
-
-        return ProductMapper.Instance.toProduct(foundEntity);
-    }
-
-    @Override
-    public List<Product> findByRange(BigDecimal startRange, BigDecimal endRange) {
-        return List.of();
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Product findByProductId(long id) {
+        return this.productJpaRepository.findById(id)
+                .map(ProductMapper.Instance::toProduct)
+                .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long count() {
-        return productJpaRepository.count();
+        return this.productJpaRepository.count();
+    }
+
+    @Override
+    public void deleteAll() {
+        this.productJpaRepository.deleteAll();
+    }
+
+    @Override
+    public List<Product> findAll() {
+        return this.productJpaRepository.findAll().stream().map(ProductMapper.Instance::toProduct).collect(Collectors.toList());
+    }
+
+    @Override
+    public void saveAll(List<Product> products) {
+        this.productJpaRepository.saveAll(products.stream().map(ProductMapper.Instance::toProductEntity).collect(Collectors.toList()));
     }
 
 }

@@ -13,10 +13,11 @@ public interface ProductRepositoryPort {
 
     Product save (Product product);
     Page<ProductEntity> queryByNameOrPriceRange(String name, BigDecimal minPrice, BigDecimal maxPrice, Pageable page);
-    Optional<Product> findByProductId(long id);
-    Product findByProductName(String name);
-    List<Product> findByRange(BigDecimal startRange, BigDecimal endRange);
+    Product findByProductId(long id);
     Long count();
+    void deleteAll();
+    List<Product> findAll();
+    void saveAll(List<Product> products);
 
 }
 
